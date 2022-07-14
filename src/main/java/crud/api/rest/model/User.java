@@ -28,6 +28,8 @@ public class User implements UserDetails  {
 	private String email;
 	@Column(nullable = false, length = 100)
 	private String senha;
+
+	protected boolean ativo;
 	
 	public Long getId() {
 		return id;

@@ -1,6 +1,7 @@
 package crud.api.rest;
 
 import java.util.Properties;
+import java.util.Random;
 
 import javax.mail.Address;
 import javax.mail.Authenticator;
@@ -24,27 +25,31 @@ class ApplicationTests {
 	}
 	
 	public static void main(String[] args) {
-		String email = "kildere.java.test@g@mail.com.br";
+		Random rnd = new Random();
+
+		for (int i = 0; i < 5; i++) {
+			System.out.println(rnd.nextInt(10));
+		}
+	}
+	
+
+	/*
+	 String email = "kildere.java.test@okok.com.br";
 		String senha = "javatest2002";
 		
 		String myEmail = "kilderehenriquedp@gmail.com";
 
-		try {
-			InternetAddress emailAddr = new InternetAddress(email);
-			emailAddr.validate();
-		} catch (AddressException ex) {
-			System.out.println("FFF");
-		}
-		
-		/*
-		try {			
+		try {	
+			new InternetAddress(email).validate();
+			
 			Properties p = new Properties();
+			
 			p.put("mail.smtp.auth", "true");
-			//p.put("mail.smtp.starttls", "true");
-			p.put("mail.smtp.host", "smtp.gmail.com");
-			p.put("mail.smtp.port", "465");//587 ou 465
-			p.put("mail.smtp.socketFactory.port", "465");
-			p.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");			
+			p.put("mail.smtp.starttls", "true");
+			p.put("mail.smtp.host", "smtp-mail.outlook.com");
+			p.put("mail.smtp.port", "587");
+			p.put("mail.smtp.starttls.enable","true");
+			p.put("mail.smtp.auth", "true"); 
 		
 			Session session = Session.getInstance(p, new Authenticator() {
 				@Override
@@ -60,13 +65,13 @@ class ApplicationTests {
 			message.setRecipients(Message.RecipientType.TO, toEmails);
 			message.setSubject("Mensagem de test");
 			message.setText("Hello World!");
+
 			
 			Transport.send(message);
-		
+
+			System.out.println("Enviado!");
 		} catch (Exception e) {
 			System.out.println(e);
 		}
-		 */
-	}
-	
+	 */
 }
