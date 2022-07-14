@@ -13,6 +13,8 @@ import javax.persistence.SequenceGenerator;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Entity
 @SequenceGenerator(name = "seq_user", sequenceName = "seq_user", allocationSize = 1, initialValue = 1)
 public class User implements UserDetails  {
@@ -29,8 +31,14 @@ public class User implements UserDetails  {
 	@Column(nullable = false, length = 100)
 	private String senha;
 
-	protected boolean ativo;
+	@JsonIgnore //verificar import
+	@Column(nullable = false) //verificar SQL
+	protected boolean anable = false;
+
+	@JsonIgnore //verificar import
+	protected String authCode = null;
 	
+
 	public Long getId() {
 		return id;
 	}
@@ -57,6 +65,13 @@ public class User implements UserDetails  {
 	}
 	public void setEmail(String email) {
 		this.email = email;
+	}
+
+	public void setAuthCode(String authCode) {
+		if(authCode != null){
+			this.authCode = authCode;
+			//chama thread que exclui auth code
+		}
 	}
 
 	@Override
@@ -86,9 +101,14 @@ public class User implements UserDetails  {
 	public boolean isCredentialsNonExpired() {
 		return true;
 	}
+	public void enable(String authCode){
+		if(this.authCode.equals(authCode)){
+			anable = true;
+		}
+	}
 	@Override
 	public boolean isEnabled() {
-		return true;
+		return anable;
 	}
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {

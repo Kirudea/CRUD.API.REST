@@ -39,10 +39,10 @@ public class Controller {
 	private static byte wrong_field;
 	
 	public static void main(String[] args) {
-		System.out.println(validarEmail("kildere.java.test@gmail.com"));
+		System.out.println(sendAuthCodeEmail("kildere.java.test@gmail.com"));
 	}
 
-	public static boolean validarEmail(String email){
+	private static boolean validEmail(String email){
 		try{
 			new InternetAddress(email).validate();
 			return true;
@@ -51,7 +51,7 @@ public class Controller {
 		}
 	}
 
-	public static boolean authCodeEmail(String email){
+	private static String sendAuthCodeEmail(String email){
 		String systemAddress = "kildere.java.test@outlook.com";
 		String senha = "javatest2002";
 		
@@ -90,9 +90,10 @@ public class Controller {
 							 authCode);
 
 			Transport.send(message);
-			return true;
+
+			return authCode;
 		} catch (Exception e) {
-			return false;
+			return null;
 		}
 	}
 	
@@ -139,18 +140,28 @@ public class Controller {
 		user.setLogin(user.getLogin().trim());
 		user.setEmail(user.getEmail().trim());
 		
-		User aux;
+		User auxUser;
 		
 		if(!(user.getLogin() == null || user.getLogin().isEmpty())) {
-			aux = userRepository.findUserByLogin(user.getLogin());
+			auxUser = userRepository.findUserByLogin(user.getLogin());
 			//Se não houver ou for o mesmo
-			if(aux == null || (long) aux.getId() == (long) user.getId()) {
-				if(validarEmail(user.getEmail())) {
-					aux = userRepository.findUserByEmail(user.getEmail());
+			if(auxUser == null || (long) auxUser.getId() == (long) user.getId()) {
+				if(validEmail(user.getEmail())) {
+					auxUser = userRepository.findUserByEmail(user.getEmail());
 					//Se não houver ou for o mesmo
-					if(aux == null || (long) aux.getId() == (long) user.getId()) {
+					if(auxUser == null || (long) auxUser.getId() == (long) user.getId()) {
 						if(!(user.getSenha() == null || user.getSenha().length() < 8)) {
-							return user;
+							//---Test---
+							String code = sendAuthCodeEmail(user.getEmail());
+							
+							if(code != null){
+								user.setAuthCode(code);
+								return user;
+							}
+
+							status = HttpStatus.INTERNAL_SERVER_ERROR;
+							wrong_field = 0;
+							response = "Erro ao enviar código de verificação!";
 						}else {
 							wrong_field = 4;
 							response = "Senha inválida!";
@@ -189,7 +200,7 @@ public class Controller {
 	
 	@PutMapping(value = "/", produces = "application/json")
 	public ResponseEntity<String> Update(@RequestBody User user) { 
-		
+
 		UpdateUser(user);
 		
 		response = "{\"status\": \""+status+"\","+
