@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import crud.api.rest.ApplicationContextLoad;
 import crud.api.rest.model.User;
 import crud.api.rest.repository.UserRepository;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 
@@ -22,7 +23,8 @@ import io.jsonwebtoken.SignatureAlgorithm;
 public class JWTTokenAuthService {
 	
 	//Em milisegundos
-	//1 dia = 86400000
+	//1 dia = 86400000L
+	//5 min = 300000L
 	private static final long EXPIRATION_TIME = 86400000L;
 	
 	//Senha para melhorar a auth
@@ -51,24 +53,26 @@ public class JWTTokenAuthService {
 		response.getWriter().write("{\"Authorization\": \""+token+"\"}");
 	}
 	
-	public Authentication getAuth(HttpServletRequest request) {
+	public Authentication getAuth(HttpServletRequest request, HttpServletResponse response) {
 		String token = request.getHeader(HEADER_STRING);
 		
-		if(token != null) {
-			String userName = Jwts.parser().setSigningKey(SECRET) //Cria analisador e define a chave secreta
-			.parseClaimsJws(token.replace(TOKEN_PREFIX, "")) //Traduz o token para json
-			.getBody().getSubject(); //Pega o usuário do corpo do json
-			
-			if(userName != null) { 
-				//Como não foi possivel utilizar injeção do UserRepository
-				//Foi criado um Contexto de Aplicação para chama-lo
-				User user = ApplicationContextLoad.getApplicationContext()
-							.getBean(UserRepository.class).findUserByLogin(userName);
+		try {			
+			if(token != null) {
+				String userName = Jwts.parser().setSigningKey(SECRET) //Cria analisador e define a chave secreta
+						.parseClaimsJws(token.replace(TOKEN_PREFIX, "").trim()) //Traduz o token para json
+						.getBody().getSubject(); //Pega o usuário do corpo do json
 				
-				if(user != null)
-					return new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword(), user.getAuthorities()); 
+				if(userName != null) { 
+					//Como não foi possivel utilizar injeção do UserRepository
+					//Foi criado um Contexto de Aplicação para chama-lo
+					User user = ApplicationContextLoad.getApplicationContext()
+							.getBean(UserRepository.class).findUserByLogin(userName);
+					
+					if(user != null)
+						return new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword(), user.getAuthorities()); 
+				}
 			}
-		}
+		}catch(ExpiredJwtException e) {}
 		
 		return null;
 	}

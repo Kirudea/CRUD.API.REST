@@ -7,6 +7,7 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -19,7 +20,7 @@ public class JWTAPIAuthFilter extends GenericFilterBean {
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
 			throws IOException, ServletException {
 		//Envia o token para auth
-		Authentication auth = new JWTTokenAuthService().getAuth((HttpServletRequest) request);
+		Authentication auth = new JWTTokenAuthService().getAuth((HttpServletRequest) request, (HttpServletResponse) response);
 		
 		//Salva auth no Spring
 		SecurityContextHolder.getContext().setAuthentication(auth);

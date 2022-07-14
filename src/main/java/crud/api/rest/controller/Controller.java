@@ -57,26 +57,19 @@ public class Controller {
 	}
 
 	public void UpdateUser(User user) {
-		User aux = userRepository.findById(user.getId()).get();
-		
+		User aux = userRepository.findById(user.getId()).orElse(null);
 		
 		if(aux != null) {
-			if(!aux.equals(user)) {				
-				user = validUserFields(user);
-				if(user != null) {
-					//Criptografa senha
-					user.setSenha(new BCryptPasswordEncoder().encode(user.getSenha()));
-					userRepository.save(user);
-					
-					status = HttpStatus.OK;
-					wrong_field = 0;
-					response = "Usuário atualizado com sucesso!";				
-				}		
-			}else {
-				status = HttpStatus.NOT_ACCEPTABLE;
+			user = validUserFields(user);
+
+			if(user != null) {		
+				//Criptografa senha
+				user.setSenha(new BCryptPasswordEncoder().encode(user.getSenha()));
+				userRepository.save(user);
+				status = HttpStatus.OK;
 				wrong_field = 0;
-				response = "Mude algum campo!";
-			}
+				response = "Usuário atualizado com sucesso!";				
+			}		
 		}else {
 			status = HttpStatus.NOT_FOUND;
 			wrong_field = 1;
