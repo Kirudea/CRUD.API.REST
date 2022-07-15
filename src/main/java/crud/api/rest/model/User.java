@@ -1,5 +1,6 @@
 package crud.api.rest.model;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Objects;
 
@@ -14,6 +15,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+
 
 @Entity
 @SequenceGenerator(name = "seq_user", sequenceName = "seq_user", allocationSize = 1, initialValue = 1)
@@ -31,11 +33,12 @@ public class User implements UserDetails  {
 	@Column(nullable = false, length = 100)
 	private String senha;
 
-	@JsonIgnore //verificar import
+	@JsonIgnore
 	@Column(nullable = false) //verificar SQL
-	protected boolean anable = false;
+	protected boolean enable = false;
 
-	@JsonIgnore //verificar import
+	@JsonIgnore
+	@Column(unique = true)
 	protected String authCode = null;
 	
 
@@ -67,10 +70,12 @@ public class User implements UserDetails  {
 		this.email = email;
 	}
 
+	public String getAuthCode() {
+		return authCode;
+	}
 	public void setAuthCode(String authCode) {
 		if(authCode != null){
 			this.authCode = authCode;
-			//chama thread que exclui auth code
 		}
 	}
 
@@ -102,16 +107,17 @@ public class User implements UserDetails  {
 		return true;
 	}
 	public void enable(String authCode){
-		if(this.authCode.equals(authCode)){
-			anable = true;
+		if(authCode != null && authCode.equals(this.authCode)){
+			this.authCode = null;
+			this.enable = true;
 		}
 	}
 	@Override
 	public boolean isEnabled() {
-		return anable;
+		return enable;
 	}
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
-		return null;
+		return new ArrayList<>();
 	}
 }

@@ -28,7 +28,7 @@ public class WebConfigSecurity extends WebSecurityConfigurerAdapter {
 		http.csrf().csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
 		
 		//Permite URL para todos
-		.disable().authorizeHttpRequests().antMatchers("/").permitAll()
+		.disable().authorizeHttpRequests().antMatchers("/", "/user/{id}/active").permitAll()
 		//.antMatchers("/").permitAll()
 		
 		//Config URL de logout
