@@ -14,9 +14,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import crud.api.rest.AuthCodeObject;
 import crud.api.rest.StatusObject;
-import crud.api.rest.email.EmailTools;
 import crud.api.rest.model.User;
 import crud.api.rest.repository.UserRepository;
+import crud.api.rest.util.EmailTools;
 
 @RestController
 @RequestMapping(value = "/user")
@@ -25,6 +25,7 @@ public class UserController {
 	@Autowired
 	private UserRepository userRepository;	
 	private static StatusObject statusResponse = new StatusObject();
+	private EmailTools mail = new EmailTools();
 	
 	public void authCodeTimmer(User user) {
 		
@@ -32,6 +33,7 @@ public class UserController {
 			@Override
 			public void run() {
 				try {
+					//Tempo para ação
 					Thread.sleep(2*60*1000);
 					
 					if(!userRepository.findById(user.getId()).get().isEnabled()) {
@@ -59,7 +61,6 @@ public class UserController {
 			auxUser = userRepository.findUserByLogin(user.getLogin());
 			//Se não houver ou for o mesmo
 			if(auxUser == null || (long) auxUser.getId() == (long) user.getId()) {
-				EmailTools mail = new EmailTools();
 				if(mail.validEmail(user.getEmail())) {
 					auxUser = userRepository.findUserByEmail(user.getEmail());
 					//Se não houver ou for o mesmo
