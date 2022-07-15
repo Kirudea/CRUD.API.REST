@@ -19,7 +19,7 @@
   Ferramenta testes: [POSTMAN](https://www.postman.com/downloads/)
 
 ## Back-End: 90%
-  ### URL's mapeadas:
+  ### URI's mapeadas:
   - GET:
     - /mysystem/
     - /mysystem/users
