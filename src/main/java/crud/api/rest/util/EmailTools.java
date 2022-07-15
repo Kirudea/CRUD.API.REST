@@ -12,6 +12,8 @@ import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
+import crud.api.rest.model.User;
+
 public class EmailTools {
 
 	public boolean validEmail(String email){
@@ -34,7 +36,7 @@ public class EmailTools {
 		return authCode;
 	}
 
-	public boolean sendAuthCodeEmail(String email, String authCode){
+	public boolean sendAuthCodeEmail(User user, String assunto){
 		String systemAddress = "kildere.java.test@outlook.com.br";
 		String senha = "javatest2002";
 		
@@ -55,15 +57,16 @@ public class EmailTools {
 				}
 			}); 
 			
-			Address[] toEmails = InternetAddress.parse(email); 	
+			Address[] toEmails = InternetAddress.parse(user.getEmail()); 	
 			
 			Message message = new MimeMessage(session);
 			message.setFrom(new InternetAddress(systemAddress)); //Remetente
 			message.setRecipients(Message.RecipientType.TO, toEmails);
 			message.setSubject("Confirmação de email");
-			message.setText("O email "+email+" foi informado para utilização do sistema MySystem.\n\n"+
-							"Utilize o códido abaixo para autenticação.\n\n"+
-							 authCode);
+			//"O email "+user.getEmail()+" foi informado para utilização do sistema MySystem."
+			message.setText(assunto+
+							"\n\nUtilize o códido abaixo para autenticação.\n\n"+
+							 user.getAuthCode());
 
 			Transport.send(message);
 
