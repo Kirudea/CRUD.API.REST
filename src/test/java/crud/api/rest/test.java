@@ -5,46 +5,55 @@ import crud.api.rest.repository.UserRepository;
 
 public class test {
     
-    public void create(User user){
-        if(user != null){
-            if(user.getId() == 0){
-                user = validUserFields(user);
-                
-                if(user != null){
-                    mail.sendAuthCodeEmail(user, "O email "+user.getEmail()+" foi informado para utilização do sistema MySystem.");
-                    
-                    if(/* Se email for confirmado */){
-                       userRepository.save(user); 
-                    }
-                }
-            }else{
-                //ID foi informado
-            }
-        }else {
-            //user inválido
-        }
-    }
-    
-    public void update(User user){
-        User currentUser = userRepository.findById(user.getId()).orElse(null);
+    //@PutMapping(value = "/", produces = "application/json")
+    public ResponseEntity<StatusObject> update(@RequestBody User user){
+		User currentUser = userRepository.findById(user.getId()).orElse(null);
         
         if(user != null){
-            if(currentUser != null){
-                user = validUserFields(user);
+			if(currentUser != null){
+				user = validUserFields(user);
                 
                 if(user != null){
-                    mail.sendAuthCodeEmail(user, "Foi solicitado a alteração dos dados da sua conta.");
+					mail.sendAuthCodeEmail(user, "Foi solicitado a alteração dos dados da sua conta.");
                     
                     if(/* Se email for confirmado */){
-                       userRepository.save(user); 
+						userRepository.save(user); 
+						statusResponse.setHttpStatus(HttpStatus.OK);
+						statusResponse.setMessage("Usuário atualizado com sucesso!");
                     }
                 }
             }else{
-                //user not found
+				statusResponse.setHttpStatus(HttpStatus.NOT_FOUND);
+				statusResponse.setMessage("Usuário não encontrado!");
             }
         }else{
-            //user inválido
+			statusResponse.setHttpStatus(HttpStatus.NOT_ACCEPTABLE);
+			statusResponse.setMessage("Usuário inválido!");
         }
+
+		return new ResponseEntity<StatusObject>(statusResponse, HttpStatus.OK);
     }
+
+	////
+	
+	@DeleteMapping(value = "/{id}", produces = "application/json")
+	public ResponseEntity<StatusObject> Delete(@PathVariable("id") long id){
+		User user = userRepository.findById(id).orElse(null);
+
+		statusResponse.setHttpStatus(HttpStatus.NOT_FOUND);
+		statusResponse.setMessage("Usuário não encontrado!");
+		
+		if(user != null){
+			mail.sendAuthCodeEmail(user, "Foi solicitado a exclusão da sua conta.");
+
+			if(/* Se email for confirmado */){
+				userRepository.deleteById(id);
+				statusResponse.setHttpStatus(HttpStatus.OK);
+				statusResponse.setMessage("Usuário deletado com sucesso!");
+			}
+		}
+		
+		return new ResponseEntity<StatusObject>(statusResponse, HttpStatus.OK);
+	}
     
 }
