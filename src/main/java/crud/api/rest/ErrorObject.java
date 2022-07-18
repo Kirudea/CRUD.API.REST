@@ -2,7 +2,7 @@ package crud.api.rest;
 
 import org.springframework.http.HttpStatus;
 
-public class StatusObject {
+public class ErrorObject {
 	
 	private HttpStatus httpStatus;
 	private String message;

@@ -5,19 +5,19 @@ import crud.api.rest.repository.UserRepository;
 
 public class test {
     
-    //@PutMapping(value = "/", produces = "application/json")
-    public ResponseEntity<StatusObject> update(@RequestBody User user){
-		User currentUser = userRepository.findById(user.getId()).orElse(null);
-        
-        if(user != null){
+    @PutMapping(value = "/", produces = "application/json")
+    public ResponseEntity<StatusObject> update(@RequestBody User newUser){
+		if(newUser != null){
+			User currentUser = userRepository.findById(newUser.getId()).orElse(null);
+			
 			if(currentUser != null){
-				user = validUserFields(user);
+				newUser = validUserFields(newUser);
                 
-                if(user != null){
-					mail.sendAuthCodeEmail(user, "Foi solicitado a alteração dos dados da sua conta.");
+                if(newUser != null){
+					mail.sendAuthCodeEmail(newUser, "Foi solicitado a alteração dos dados da sua conta.");
                     
                     if(/* Se email for confirmado */){
-						userRepository.save(user); 
+						userRepository.save(newUser); 
 						statusResponse.setHttpStatus(HttpStatus.OK);
 						statusResponse.setMessage("Usuário atualizado com sucesso!");
                     }

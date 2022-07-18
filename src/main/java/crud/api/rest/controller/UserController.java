@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import crud.api.rest.AuthCodeObject;
-import crud.api.rest.StatusObject;
+import crud.api.rest.ErrorObject;
 import crud.api.rest.model.User;
 import crud.api.rest.repository.UserRepository;
 import crud.api.rest.util.EmailTools;
@@ -24,7 +24,7 @@ public class UserController {
 	
 	@Autowired
 	private UserRepository userRepository;	
-	private static StatusObject statusResponse = new StatusObject();
+	private static ErrorObject statusResponse = new ErrorObject();
 	private EmailTools mail = new EmailTools();
 	
 	public void authCodeTimmer(User user) {
@@ -92,7 +92,7 @@ public class UserController {
 	}
 	
 	@PostMapping(value = "/", produces = "application/json")
-	public ResponseEntity<StatusObject> Create(@RequestBody User user) { 
+	public ResponseEntity<ErrorObject> Create(@RequestBody User user) { 
 		
 		if(user.getId() == 0) {		
 			user = validUserFields(user);
@@ -113,11 +113,11 @@ public class UserController {
 			statusResponse.setMessage("ID foi informado!");
 		}
 
-		return new ResponseEntity<StatusObject>(statusResponse, HttpStatus.OK);
+		return new ResponseEntity<ErrorObject>(statusResponse, HttpStatus.OK);
 	}
 	
 	@PutMapping(value = "/", produces = "application/json")
-	public ResponseEntity<StatusObject> Update(@RequestBody User user) { 
+	public ResponseEntity<ErrorObject> Update(@RequestBody User user) { 
 
 		User auxUser = user;
 		
@@ -144,11 +144,11 @@ public class UserController {
 			statusResponse.setMessage("Usuário não encontrado!");		
 		}
 		
-		return new ResponseEntity<StatusObject>(statusResponse, HttpStatus.OK);
+		return new ResponseEntity<ErrorObject>(statusResponse, HttpStatus.OK);
 	}
 	
 	@DeleteMapping(value = "/{id}", produces = "application/json")
-	public ResponseEntity<StatusObject> Delete(@PathVariable("id") long id){
+	public ResponseEntity<ErrorObject> Delete(@PathVariable("id") long id){
 		User user = userRepository.findById(id).orElse(null);
 
 		statusResponse.setHttpStatus(HttpStatus.NOT_FOUND);
@@ -162,11 +162,11 @@ public class UserController {
 			statusResponse.setMessage("Usuário deletado com sucesso!");
 		}
 		
-		return new ResponseEntity<StatusObject>(statusResponse, HttpStatus.OK);
+		return new ResponseEntity<ErrorObject>(statusResponse, HttpStatus.OK);
 	}
 	
 	@PutMapping(value = "/{id}/active", produces = "application/json")
-	public ResponseEntity<StatusObject> ActiveUser(@PathVariable("id") long id, @RequestBody AuthCodeObject code) { 
+	public ResponseEntity<ErrorObject> ActiveUser(@PathVariable("id") long id, @RequestBody AuthCodeObject code) { 
 		statusResponse.setHttpStatus(HttpStatus.NOT_FOUND);
 		statusResponse.setMessage("Não foi possivel ativar a conta!");
 		
@@ -182,14 +182,7 @@ public class UserController {
 			}
 		}
 		
-		return new ResponseEntity<StatusObject>(statusResponse, HttpStatus.OK);
-	}
-	
-	@PutMapping(value = "/{id}/forgotpassword", produces = "application/json")
-	public ResponseEntity<StatusObject> RecoverPassword(@PathVariable("id") long id, @RequestBody String code) { 
-		
-
-		return new ResponseEntity<StatusObject>(statusResponse, HttpStatus.OK);
+		return new ResponseEntity<ErrorObject>(statusResponse, HttpStatus.OK);
 	}
 	
 }
