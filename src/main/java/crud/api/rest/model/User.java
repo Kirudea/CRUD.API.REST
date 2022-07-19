@@ -39,7 +39,7 @@ public class User implements UserDetails  {
 
 	@JsonIgnore
 	@Column(unique = true)
-	protected String authCode = null;
+	protected String auth_code = null;
 	
 
 	public Long getId() {
@@ -70,12 +70,12 @@ public class User implements UserDetails  {
 		this.email = email;
 	}
 
-	public String getAuthCode() {
-		return authCode;
+	public String getCode() {
+		return auth_code;
 	}
-	public void setAuthCode(String authCode) {
-		if(authCode != null){
-			this.authCode = authCode;
+	public void setCode(String auth_code) {
+		if(auth_code != null){
+			this.auth_code = auth_code;
 		}
 	}
 
@@ -107,8 +107,8 @@ public class User implements UserDetails  {
 		return true;
 	}
 	public void enable(String authCode){
-		if(authCode != null && authCode.equals(this.authCode)){
-			this.authCode = null;
+		if(authCode != null && authCode.equals(this.auth_code)){
+			this.auth_code = null;
 			this.enable = true;
 		}
 	}

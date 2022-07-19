@@ -1,18 +1,16 @@
 package crud.api.rest;
 
-import org.springframework.http.HttpStatus;
-
 public class ErrorObject {
 	
-	private HttpStatus httpStatus;
+	private String error;
 	private String message;
 	
 	
-	public HttpStatus getHttpStatus() {
-		return httpStatus;
+	public String getError() {
+		return error;
 	}
-	public void setHttpStatus(HttpStatus httpStatus) {
-		this.httpStatus = httpStatus;
+	public void setError(String error) {
+		this.error = error;
 	}
 	
 	public String getMessage() {

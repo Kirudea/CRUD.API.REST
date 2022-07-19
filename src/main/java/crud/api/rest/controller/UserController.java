@@ -1,5 +1,7 @@
 package crud.api.rest.controller;
 
+import javax.mail.MessagingException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,11 +14,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import crud.api.rest.AuthCodeObject;
+import crud.api.rest.CodeObject;
 import crud.api.rest.ErrorObject;
 import crud.api.rest.model.User;
 import crud.api.rest.repository.UserRepository;
-import crud.api.rest.util.EmailTools;
+import crud.api.rest.service.EmailToolsService;
 
 @RestController
 @RequestMapping(value = "/user")
@@ -25,7 +27,7 @@ public class UserController {
 	@Autowired
 	private UserRepository userRepository;	
 	private static ErrorObject statusResponse = new ErrorObject();
-	private EmailTools mail = new EmailTools();
+	private EmailToolsService mail = new EmailToolsService();
 	
 	public void authCodeTimmer(User user) {
 		
@@ -50,7 +52,7 @@ public class UserController {
 	}
 	
 	public User validUserFields(User user) {
-		statusResponse.setHttpStatus(HttpStatus.NOT_ACCEPTABLE);
+		statusResponse.setError(HttpStatus.NOT_ACCEPTABLE.toString());
 		
 		user.setLogin(user.getLogin().trim());
 		user.setEmail(user.getEmail().trim());
@@ -66,10 +68,10 @@ public class UserController {
 					//Se não houver ou for o mesmo
 					if(auxUser == null || (long) auxUser.getId() == (long) user.getId()) {
 						if(!(user.getSenha() == null || user.getSenha().length() < 8)) {
-							String code = mail.generateAuthCode();
+							String code = mail.generateCode(5);
 
 							user.setSenha(new BCryptPasswordEncoder().encode(user.getSenha()));
-							user.setAuthCode(code);
+							user.setCode(code);
 							
 							return user;
 						}else {
@@ -92,24 +94,25 @@ public class UserController {
 	}
 	
 	@PostMapping(value = "/", produces = "application/json")
-	public ResponseEntity<ErrorObject> Create(@RequestBody User user) { 
+	public ResponseEntity<ErrorObject> create(@RequestBody User user) throws MessagingException { 
 		
 		if(user.getId() == 0) {		
+			//Valida o user e atualiza o responseStatus
 			user = validUserFields(user);
+		
 			if(user != null) {
+				//Salva e inicia o timmer de 2min
 				authCodeTimmer(userRepository.save(user));
 				
-				if(mail.sendAuthCodeEmail(user, "O email "+user.getEmail()+" foi informado para utilização do sistema MySystem.")) {					
-					statusResponse.setHttpStatus(HttpStatus.CREATED);
-					statusResponse.setMessage("Usuário criado com sucesso!");
-				}else {
-					statusResponse.setHttpStatus(HttpStatus.NOT_ACCEPTABLE);
-					statusResponse.setMessage("Email de confirmação não enviado!");
-				}
-				
+				mail.sendAuthCodeEmail(user.getEmail(), "MySystem: Email de confirmação", 
+						"O email "+user.getEmail()+" foi informado para utilização do sistema MySystem."+
+						"\n\nUtilize o código abaixo para validar.\n\n"+user.getCode());
+
+				statusResponse.setError(HttpStatus.CREATED.toString());
+				statusResponse.setMessage("Usuário criado com sucesso!");
 			}
 		}else {
-			statusResponse.setHttpStatus(HttpStatus.NOT_ACCEPTABLE);
+			statusResponse.setError(HttpStatus.NOT_ACCEPTABLE.toString());
 			statusResponse.setMessage("ID foi informado!");
 		}
 
@@ -117,67 +120,61 @@ public class UserController {
 	}
 	
 	@PutMapping(value = "/", produces = "application/json")
-	public ResponseEntity<ErrorObject> Update(@RequestBody User user) { 
+    public ResponseEntity<ErrorObject> update(@RequestBody User user) throws MessagingException{
+		statusResponse.setError(HttpStatus.NOT_FOUND.toString());
+		statusResponse.setMessage("Usuário não encontrado!");
 
-		User auxUser = user;
-		
-		if(userRepository.existsById(user.getId())) {
+		if(user.getId() != null && userRepository.existsById(user.getId())){
+			//Valida o user e atualiza o responseStatus
 			user = validUserFields(user);
+            
+            if(user != null){
+            	userRepository.save(user); 
 
-			if(user != null) {		
-				userRepository.save(user);
-
-				statusResponse.setHttpStatus(HttpStatus.OK);
+            	mail.sendAuthCodeEmail(user.getEmail(), "MySystem: Alteração de dados", "Foi realizado a alteração dos dados da sua conta.");
+                
+				statusResponse.setError(HttpStatus.OK.toString());
 				statusResponse.setMessage("Usuário atualizado com sucesso!");
-				
-				user.setLogin(null);
-				auxUser.setLogin(null);
-									
-				//código de confirmação para alterar
-				if(!mail.sendAuthCodeEmail(user, null)) {
-					statusResponse.setHttpStatus(HttpStatus.NOT_ACCEPTABLE);
-					statusResponse.setMessage("Email de confirmação não enviado!");
-				}
-			}		
-		}else {
-			statusResponse.setHttpStatus(HttpStatus.NOT_FOUND);
-			statusResponse.setMessage("Usuário não encontrado!");		
-		}
-		
+            }
+        }
+
 		return new ResponseEntity<ErrorObject>(statusResponse, HttpStatus.OK);
-	}
+    }
 	
 	@DeleteMapping(value = "/{id}", produces = "application/json")
-	public ResponseEntity<ErrorObject> Delete(@PathVariable("id") long id){
+	public ResponseEntity<ErrorObject> delete(@PathVariable("id") long id) throws MessagingException{
 		User user = userRepository.findById(id).orElse(null);
 
-		statusResponse.setHttpStatus(HttpStatus.NOT_FOUND);
+		statusResponse.setError(HttpStatus.NOT_FOUND.toString());
 		statusResponse.setMessage("Usuário não encontrado!");
 		
 		if(user != null){
-			mail.sendAuthCodeEmail(user, "Foi solicitado a exclusão da sua conta.");
-
 			userRepository.deleteById(id);
-			statusResponse.setHttpStatus(HttpStatus.OK);
+
+			mail.sendAuthCodeEmail(user.getEmail(), "MySystem: Exclusão de conta", "Foi realizado a exclusão da sua conta.");
+			
+			statusResponse.setError(HttpStatus.OK.toString());
 			statusResponse.setMessage("Usuário deletado com sucesso!");
 		}
 		
 		return new ResponseEntity<ErrorObject>(statusResponse, HttpStatus.OK);
 	}
 	
-	@PutMapping(value = "/{id}/active", produces = "application/json")
-	public ResponseEntity<ErrorObject> ActiveUser(@PathVariable("id") long id, @RequestBody AuthCodeObject code) { 
-		statusResponse.setHttpStatus(HttpStatus.NOT_FOUND);
+	@PutMapping(value = "/{id}/activate", produces = "application/json")
+	public ResponseEntity<ErrorObject> ActiveUser(@PathVariable Long id, @RequestBody CodeObject code) { 
+		statusResponse.setError(HttpStatus.NOT_FOUND.toString());
 		statusResponse.setMessage("Não foi possivel ativar a conta!");
+		
 		
 		User user = userRepository.findById(id).orElse(null);
 		
 		if(user != null && !user.isEnabled()) {
 			user.enable(code.getCode());
-
+			
 			if(user.isEnabled()){
 				userRepository.save(user);
-				statusResponse.setHttpStatus(HttpStatus.OK);
+				
+				statusResponse.setError(HttpStatus.OK.toString());
 				statusResponse.setMessage("Usuário foi ativado com sucesso!");
 			}
 		}

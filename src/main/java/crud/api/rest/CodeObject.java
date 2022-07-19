@@ -1,19 +1,14 @@
 package crud.api.rest;
 
-public class AuthCodeObject {
+public class CodeObject {
 	
 	private String code;
 
 	public String getCode() {
 		return code;
 	}
-
 	public void setCode(String code) {
 		this.code = code;
 	}
 	
-	@Override
-	public String toString() {
-		return code;
-	}
 }

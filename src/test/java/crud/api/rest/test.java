@@ -1,10 +1,7 @@
 package crud.api.rest;
 
-import crud.api.rest.model.User;
-import crud.api.rest.repository.UserRepository;
-
 public class test {
-    
+    /*
     @PutMapping(value = "/", produces = "application/json")
     public ResponseEntity<StatusObject> update(@RequestBody User newUser){
 		if(newUser != null){
@@ -16,7 +13,7 @@ public class test {
                 if(newUser != null){
 					mail.sendAuthCodeEmail(newUser, "Foi solicitado a alteração dos dados da sua conta.");
                     
-                    if(/* Se email for confirmado */){
+                    if(// Se email for confirmado ){
 						userRepository.save(newUser); 
 						statusResponse.setHttpStatus(HttpStatus.OK);
 						statusResponse.setMessage("Usuário atualizado com sucesso!");
@@ -33,9 +30,10 @@ public class test {
 
 		return new ResponseEntity<StatusObject>(statusResponse, HttpStatus.OK);
     }
+    */
 
 	////
-	
+	/*
 	@DeleteMapping(value = "/{id}", produces = "application/json")
 	public ResponseEntity<StatusObject> Delete(@PathVariable("id") long id){
 		User user = userRepository.findById(id).orElse(null);
@@ -46,7 +44,7 @@ public class test {
 		if(user != null){
 			mail.sendAuthCodeEmail(user, "Foi solicitado a exclusão da sua conta.");
 
-			if(/* Se email for confirmado */){
+			if(// Se email for confirmado ){
 				userRepository.deleteById(id);
 				statusResponse.setHttpStatus(HttpStatus.OK);
 				statusResponse.setMessage("Usuário deletado com sucesso!");
@@ -55,5 +53,6 @@ public class test {
 		
 		return new ResponseEntity<StatusObject>(statusResponse, HttpStatus.OK);
 	}
+	*/
     
 }
