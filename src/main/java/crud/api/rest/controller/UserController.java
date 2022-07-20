@@ -160,7 +160,7 @@ public class UserController {
 		return new ResponseEntity<ErrorObject>(statusResponse, HttpStatus.OK);
 	}
 	
-	@PutMapping(value = "/{id}/activate", produces = "application/json")
+	@PostMapping(value = "/{id}/activate", produces = "application/json")
 	public ResponseEntity<ErrorObject> ActiveUser(@PathVariable Long id, @RequestBody CodeObject code) { 
 		statusResponse.setError(HttpStatus.NOT_FOUND.toString());
 		statusResponse.setMessage("Não foi possivel ativar a conta!");
