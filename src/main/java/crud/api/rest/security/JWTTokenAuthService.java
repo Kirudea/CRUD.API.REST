@@ -51,15 +51,21 @@ public class JWTTokenAuthService {
 		
 		response.addHeader(HEADER_STRING, token);
 		
-		// Liberar acesso de outras origens
-		response.addHeader("Access-Control-Allow-Origin", "*");
+		//Para não repetir
+		if(response.getHeader("Access-Control-Allow-Origin") == null)
+			// Liberar acesso de outras origens
+			response.addHeader("Access-Control-Allow-Origin", "*");
 		
 		response.getWriter().write("{\"Authorization\": \""+token+"\"}");
 	}
 	
 	public Authentication getAuth(HttpServletRequest request, HttpServletResponse response) {
 		String token = request.getHeader(HEADER_STRING);
-		response.addHeader("Access-Control-Allow-Origin", "*");
+		
+		//Para não repetir
+		if(response.getHeader("Access-Control-Allow-Origin") == null)
+			// Liberar acesso de outras origens
+			response.addHeader("Access-Control-Allow-Origin", "*");
 		
 		try {			
 			if(token != null) {

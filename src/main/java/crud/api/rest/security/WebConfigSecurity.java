@@ -31,6 +31,8 @@ public class WebConfigSecurity extends WebSecurityConfigurerAdapter {
 		.disable().authorizeHttpRequests().antMatchers("/", "/user/{id}/activate", "/forgotpassword/").permitAll()
 		//.antMatchers("/").permitAll()
 		
+		//.antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+		
 		//Config URL de logout
 		.anyRequest().authenticated().and().logout().logoutSuccessUrl("/")
 		

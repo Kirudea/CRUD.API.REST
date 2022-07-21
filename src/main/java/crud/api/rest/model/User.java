@@ -15,6 +15,8 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonProperty.Access;
 
 
 @Entity
@@ -56,6 +58,8 @@ public class User implements UserDetails  {
 		this.login = login;
 	}
 	
+	//@JsonIgnore afeta do Spring e dá erro no login e etc
+	@JsonProperty(access = Access.WRITE_ONLY)
 	public String getSenha() {
 		return senha;
 	}
@@ -70,6 +74,7 @@ public class User implements UserDetails  {
 		this.email = email;
 	}
 
+	@JsonIgnore
 	public String getCode() {
 		return auth_code;
 	}
@@ -84,24 +89,29 @@ public class User implements UserDetails  {
 		return Objects.hash(id);
 	}
 	
+	@JsonIgnore
 	@Override
 	public String getPassword() {
 		return senha;
 	}
 	
+	@JsonIgnore
 	@Override
 	public String getUsername() {
 		return login;
 	}
 	
+	@JsonIgnore
 	@Override
 	public boolean isAccountNonExpired() {
 		return true;
 	}
+	@JsonIgnore
 	@Override
 	public boolean isAccountNonLocked() {
 		return true;
 	}
+	@JsonIgnore
 	@Override
 	public boolean isCredentialsNonExpired() {
 		return true;
@@ -112,6 +122,7 @@ public class User implements UserDetails  {
 			this.enable = true;
 		}
 	}
+	@JsonIgnore
 	@Override
 	public boolean isEnabled() {
 		return enable;
