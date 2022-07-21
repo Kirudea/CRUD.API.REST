@@ -50,11 +50,16 @@ public class JWTTokenAuthService {
 		String token = TOKEN_PREFIX+" "+JWT;
 		
 		response.addHeader(HEADER_STRING, token);
+		
+		// Liberar acesso de outras origens
+		response.addHeader("Access-Control-Allow-Origin", "*");
+		
 		response.getWriter().write("{\"Authorization\": \""+token+"\"}");
 	}
 	
 	public Authentication getAuth(HttpServletRequest request, HttpServletResponse response) {
 		String token = request.getHeader(HEADER_STRING);
+		response.addHeader("Access-Control-Allow-Origin", "*");
 		
 		try {			
 			if(token != null) {
