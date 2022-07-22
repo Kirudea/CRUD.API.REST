@@ -9,29 +9,29 @@
 
 ## Funções:
   - Login com JWT e controle de acesso
-  - Criação de user com verificação de e-mail
-  - Consulta de user
-  - Atualização de user
-  - Exclusão de user
+  - Criação de usuário com verificação de e-mail
+  - Consulta de usuário
+  - Atualização de usuário
+  - Exclusão de usuário
+  - Recuperação de senha
 
-## Front-End: 0%
-  Front-End não foi implementado devido a problemas no back.
-  Ferramenta testes: [POSTMAN](https://www.postman.com/downloads/)
-
-## Back-End: 90%
+## Back-End: 95%
   ### URI's mapeadas:
   - GET:
-    - /mysystem/
-    - /mysystem/users
-    - /mysystem/users/{id}
+    - mysystem/
+    - mysystem/users
+    - mysystem/users/{id}
+    - mysystem/profile/*
   
   - POST:
-    - /mysystem/login
-    - /mysystem/user
+    - mysystem/login
+    - mysystem/user/
+    - myststem/user/{id}/activate
+    - mysystem/user/forgotpassword
      
   - PUT:
-    - /mysystem/user
+    - mysystem/user/
   
   - DELETE:
-    - /mysystem/user/{id}
+    - mysystem/user/{id}
 
