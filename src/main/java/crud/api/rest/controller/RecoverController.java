@@ -38,9 +38,10 @@ public class RecoverController {
 
 			if (user != null) {
 				String novaSenha = emailToolsService.generateCode(8);
-	
-				userRepository.updatePassword(new BCryptPasswordEncoder().encode(novaSenha), user.getId());
-	
+				
+				user.setSenha(new BCryptPasswordEncoder().encode(novaSenha));
+				userRepository.save(user);
+
 				String assunto = "MySystem: Senha alterada";
 				String mensagem = "Sua senha foi alterada para " + novaSenha + ".";
 	

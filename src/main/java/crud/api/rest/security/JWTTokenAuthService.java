@@ -34,6 +34,19 @@ public class JWTTokenAuthService {
 	
 	private static final String HEADER_STRING = "Authorization";
 	
+	public HttpServletResponse permitOtherOrigin(HttpServletResponse response) {
+		//Para não repetir
+				if(response.getHeader("Access-Control-Allow-Origin") == null)
+					// Liberar acesso de outras origens
+					response.addHeader("Access-Control-Allow-Origin", "*");
+				//Para não repetir
+				if(response.getHeader("Access-Control-Allow-Headers") == null)
+					// Liberar acesso de outras origens aos cabeçalhos
+					response.addHeader("Access-Control-Allow-Headers", "*");
+				
+		return response;
+	}
+	
 	//Gerando token
 	public void addAuth(HttpServletResponse response, String username) throws IOException {
 		//Montar token
@@ -51,10 +64,7 @@ public class JWTTokenAuthService {
 		
 		response.addHeader(HEADER_STRING, token);
 		
-		//Para não repetir
-		if(response.getHeader("Access-Control-Allow-Origin") == null)
-			// Liberar acesso de outras origens
-			response.addHeader("Access-Control-Allow-Origin", "*");
+		response = permitOtherOrigin(response);
 		
 		response.getWriter().write("{\"Authorization\": \""+token+"\"}");
 	}
@@ -62,10 +72,7 @@ public class JWTTokenAuthService {
 	public Authentication getAuth(HttpServletRequest request, HttpServletResponse response) {
 		String token = request.getHeader(HEADER_STRING);
 		
-		//Para não repetir
-		if(response.getHeader("Access-Control-Allow-Origin") == null)
-			// Liberar acesso de outras origens
-			response.addHeader("Access-Control-Allow-Origin", "*");
+		response = permitOtherOrigin(response);
 		
 		try {			
 			if(token != null) {
